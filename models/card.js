@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { ObjectId } = mongoose.Schema.Types;
 
-const cardSchema = mongoose.Schema({
+const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -17,10 +17,10 @@ const cardSchema = mongoose.Schema({
     type: ObjectId,
     required: true,
   },
-  likes: {
+  likes: [{
     type: ObjectId,
     default: [],
-  },
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
