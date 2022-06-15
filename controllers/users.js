@@ -40,7 +40,7 @@ module.exports.updateUserInfo = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND).send({ message: 'Такой пользователь не найден' });
+        return res.status(INCORRECT_DATA).send({ message: 'Такой пользователь не найден' });
       }
       return res.status(200).send(user);
     })
@@ -57,16 +57,13 @@ module.exports.updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND).send({ message: 'Такой пользователь не найден' });
+        return res.status(INCORRECT_DATA).send({ message: 'Такой пользователь не найден' });
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(INCORRECT_DATA).send({ message: 'Введены неверные данные' });
-      }
-      if (err.name === 'CastError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID пользователя' });
       }
       return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
