@@ -17,8 +17,13 @@ module.exports.createNewCard = (req, res) => {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(NOT_FOUND).send({ message: 'Не обнаружено информации о карточках' }));
+    .then((cards) => {
+      if (cards.length === 0) {
+        return res.status(NOT_FOUND).send({ message: 'Не обнаружено информации о карточках' });
+      }
+      return res.status(200).send(cards);
+    })
+    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' }));
 };
 
 module.exports.deleteCardById = (req, res) => {

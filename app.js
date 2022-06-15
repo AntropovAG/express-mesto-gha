@@ -24,4 +24,4 @@ app.use((req, res, next) => {
   next();
 });
 
-app.listen(PORT);
+app.listen(PORT, console.log('Сервер запущен и слушает порт:', PORT));

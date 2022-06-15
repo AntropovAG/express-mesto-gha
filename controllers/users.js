@@ -3,8 +3,13 @@ const { INCORRECT_DATA, NOT_FOUND, DEFAULT_ERROR } = require('../errors/errors')
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(NOT_FOUND).send({ message: 'Не обнаружено информации о пользователях' }));
+    .then((users) => {
+      if (users.length === 0) {
+        return res.status(NOT_FOUND).send({ message: 'Не обнаружено информации о пользователях' });
+      }
+      return res.status(200).send(users);
+    })
+    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' }));
 };
 
 module.exports.getUserByID = (req, res) => {
@@ -48,6 +53,9 @@ module.exports.updateUserInfo = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(INCORRECT_DATA).send({ message: 'Введены неверные данные' });
       }
+      if (err.name === 'CastError') {
+        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID пользователя' });
+      }
       return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
 };
@@ -64,6 +72,9 @@ module.exports.updateUserAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(INCORRECT_DATA).send({ message: 'Введены неверные данные' });
+      }
+      if (err.name === 'CastError') {
+        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID пользователя' });
       }
       return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
