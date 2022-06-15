@@ -15,7 +15,12 @@ module.exports.getUserByID = (req, res) => {
       }
       return res.status(200).send(user);
     })
-    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID пользователя' });
+      }
+      return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
+    });
 };
 
 module.exports.createNewUser = (req, res) => {
@@ -37,9 +42,6 @@ module.exports.updateUserInfo = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(INCORRECT_DATA).send({ message: 'Введены неверные данные' });
-      }
-      if (err.name === 'CastError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID пользователя' });
       }
       return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });

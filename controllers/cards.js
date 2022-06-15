@@ -43,7 +43,12 @@ module.exports.setCardLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(NOT_FOUND).send({ message: 'Такой карточки не обнаружено' });
+      }
+      return res.status(200).send({ card });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID карточки' });
@@ -58,7 +63,12 @@ module.exports.removeCardLike = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(NOT_FOUND).send({ message: 'Такой карточки не обнаружено' });
+      }
+      return res.status(200).send({ card });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID карточки' });
