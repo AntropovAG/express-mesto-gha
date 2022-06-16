@@ -3,12 +3,7 @@ const { INCORRECT_DATA, NOT_FOUND, DEFAULT_ERROR } = require('../errors/errors')
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => {
-      if (users.length === 0) {
-        return res.status(NOT_FOUND).send({ message: 'Не обнаружено информации о пользователях' });
-      }
-      return res.status(200).send(users);
-    })
+    .then((users) => res.status(200).send(users))
     .catch(() => res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' }));
 };
 
