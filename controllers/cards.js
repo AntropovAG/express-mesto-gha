@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { INCORRECT_DATA, NOT_FOUND } = require('../errors/errors');
+const { INCORRECT_DATA, NOT_FOUND, NO_RIGHTS_TO_DELETE } = require('../errors/errors');
 
 module.exports.createNewCard = (req, res, next) => {
   const {
@@ -32,7 +32,7 @@ module.exports.deleteCardById = (req, res, next) => {
       }
       if (card.owner.toString() !== req.user._id) {
         const err = new Error('Удаление чужой карточки запрещено');
-        err.statusCode = NOT_FOUND;
+        err.statusCode = NO_RIGHTS_TO_DELETE;
         next(err);
       }
       return res.status(200).send({ message: 'Карточка успешно удалена' });
@@ -75,6 +75,11 @@ module.exports.removeCardLike = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      const err = new Error('Такой карточки не обнаружено');
+      err.statusCode = NOT_FOUND;
+      next(err);
+    })
     .then((card) => {
       if (!card) {
         const err = new Error('Такой карточки не обнаружено');
