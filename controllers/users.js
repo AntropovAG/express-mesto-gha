@@ -7,9 +7,10 @@ const {
 
 const MONGO_DUPLICATE_ERROR_CODE = 11000;
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send(users));
+    .then((users) => res.status(200).send(users))
+    .catch((err) => next(err));
 };
 
 module.exports.getUserByID = (req, res, next) => {
@@ -39,7 +40,9 @@ module.exports.createNewUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(201).send({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
+    }))
     .catch((error) => {
       if (error.code === MONGO_DUPLICATE_ERROR_CODE) {
         const err = new Error('Пользователь с таким email уже существует');
@@ -138,9 +141,9 @@ module.exports.userLogin = (req, res, next) => {
 };
 
 module.exports.getCurrentUserInfo = (req, res, next) => {
-  User.findById(req._id)
+  User.findById(req.user._id)
     .then((user) => {
-      if (!user) {
+      if (!user._id) {
         const err = new Error('Такой пользователь не найден');
         err.statusCode = NOT_FOUND;
         next(err);

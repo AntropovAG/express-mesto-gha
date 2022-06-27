@@ -16,9 +16,10 @@ module.exports.createNewCard = (req, res, next) => {
     });
 };
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards));
+    .then((cards) => res.status(200).send(cards))
+    .catch((err) => next(err));
 };
 
 module.exports.deleteCardById = (req, res, next) => {
@@ -75,7 +76,7 @@ module.exports.removeCardLike = (req, res, next) => {
         err.statusCode = NOT_FOUND;
         next(err);
       }
-      return res.status(200).send({ card });
+      return res.status(200).send({ message: 'Лайк удалён' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
