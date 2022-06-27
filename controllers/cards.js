@@ -30,6 +30,11 @@ module.exports.deleteCardById = (req, res, next) => {
         err.statusCode = NOT_FOUND;
         next(err);
       }
+      if (card.owner.toString() !== req.user._id) {
+        const err = new Error('Удаление чужой карточки запрещено');
+        err.statusCode = NOT_FOUND;
+        next(err);
+      }
       return res.status(200).send({ message: 'Карточка успешно удалена' });
     })
     .catch((error) => {
