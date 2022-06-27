@@ -1,43 +1,46 @@
 const Card = require('../models/card');
-const { INCORRECT_DATA, NOT_FOUND, DEFAULT_ERROR } = require('../errors/errors');
+const { INCORRECT_DATA, NOT_FOUND } = require('../errors/errors');
 
-module.exports.createNewCard = (req, res) => {
+module.exports.createNewCard = (req, res, next) => {
   const {
     name, link,
   } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Введены неверные данные' });
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        const err = new Error('Введены неверные данные');
+        err.statusCode = INCORRECT_DATA;
+        next(err);
       }
-      return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
 };
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' }));
+    .then((cards) => res.status(200).send(cards));
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCardById = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Такой карточки не обнаружено' });
+        const err = new Error('Такой карточки не обнаружено');
+        err.statusCode = NOT_FOUND;
+        next(err);
       }
       return res.status(200).send({ message: 'Карточка успешно удалена' });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID карточки' });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        const err = new Error('Ошибка в ID карточки');
+        err.statusCode = INCORRECT_DATA;
+        next(err);
       }
-      return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
 };
 
-module.exports.setCardLike = (req, res) => {
+module.exports.setCardLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -45,19 +48,22 @@ module.exports.setCardLike = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Такой карточки не обнаружено' });
+        const err = new Error('Такой карточки не обнаружено');
+        err.statusCode = NOT_FOUND;
+        next(err);
       }
       return res.status(200).send({ card });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID карточки' });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        const err = new Error('Ошибка в ID карточки');
+        err.statusCode = INCORRECT_DATA;
+        next(err);
       }
-      return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
 };
 
-module.exports.removeCardLike = (req, res) => {
+module.exports.removeCardLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -65,14 +71,17 @@ module.exports.removeCardLike = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Такой карточки не обнаружено' });
+        const err = new Error('Такой карточки не обнаружено');
+        err.statusCode = NOT_FOUND;
+        next(err);
       }
       return res.status(200).send({ card });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(INCORRECT_DATA).send({ message: 'Ошибка в ID карточки' });
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        const err = new Error('Ошибка в ID карточки');
+        err.statusCode = INCORRECT_DATA;
+        next(err);
       }
-      return res.status(DEFAULT_ERROR).send({ message: 'Общая ошибка сервера' });
     });
 };
