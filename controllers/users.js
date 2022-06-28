@@ -101,14 +101,14 @@ module.exports.userLogin = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((foundUser) => {
       if (!foundUser) {
-        return next(new DuplicateEmailError('Неправильный e-mail или пароль'));
+        return next(new WrongEmailOrPasswordError('Неправильный e-mail или пароль'));
       }
       user = foundUser;
       return bcrypt.compare(password, user.password);
     })
     .then((matched) => {
       if (!matched) {
-        return next(new DuplicateEmailError('Неправильный e-mail или пароль'));
+        return next(new WrongEmailOrPasswordError('Неправильный e-mail или пароль'));
       }
       const token = jwt.sign({ _id: user.id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
