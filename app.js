@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
 const { userLogin, createNewUser } = require('./controllers/users');
-const { NOT_FOUND } = require('./errors/errors');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -37,11 +37,7 @@ app.use(auth);
 app.use('/', require('./routes/users'));
 app.use('/', require('./routes/cards'));
 
-app.use((req, res, next) => {
-  const err = new Error('Такой страницы не существует');
-  err.statusCode = NOT_FOUND;
-  next(err);
-});
+app.use((req, res, next) => next(new NotFoundError('Такой страницы не существует')));
 
 app.use(errors());
 app.use(errorsHandler);
