@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { INCORRECT_DATA, NOT_FOUND, NO_RIGHTS_TO_DELETE } = require('../errors/errors');
+const NoRightsToDeleteError = require('../errors/NoRightsToDeleteError');
+const NotFoundError = require('../errors/NotFoundError');
+const WrongDataError = require('../errors/WrongDataError');
 
 module.exports.createNewCard = (req, res, next) => {
   const {
@@ -9,10 +11,9 @@ module.exports.createNewCard = (req, res, next) => {
     .then((card) => res.status(201).send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        const err = new Error('Введены неверные данные');
-        err.statusCode = INCORRECT_DATA;
-        next(err);
+        return next(new WrongDataError('Введены неверные данные'));
       }
+      return next(error);
     });
 };
 
@@ -26,23 +27,18 @@ module.exports.deleteCardById = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        const err = new Error('Такой карточки не обнаружено');
-        err.statusCode = NOT_FOUND;
-        next(err);
+        return next(new NotFoundError('Такой карточки не обнаружено'));
       }
       if (card.owner.toString() !== req.user._id) {
-        const err = new Error('Удаление чужой карточки запрещено');
-        err.statusCode = NO_RIGHTS_TO_DELETE;
-        next(err);
+        return next(new NoRightsToDeleteError('Удаление чужой карточки запрещено'));
       }
       return res.status(200).send({ message: 'Карточка успешно удалена' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        const err = new Error('Ошибка в ID карточки');
-        err.statusCode = INCORRECT_DATA;
-        next(err);
+        return next(new WrongDataError('Ошибка в ID карточки'));
       }
+      return next(error);
     });
 };
 
@@ -54,18 +50,15 @@ module.exports.setCardLike = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        const err = new Error('Такой карточки не обнаружено');
-        err.statusCode = NOT_FOUND;
-        next(err);
+        return next(new NotFoundError('Такой карточки не обнаружено'));
       }
       return res.status(200).send({ card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        const err = new Error('Ошибка в ID карточки');
-        err.statusCode = INCORRECT_DATA;
-        next(err);
+        return next(new WrongDataError('Ошибка в ID карточки'));
       }
+      return next(error);
     });
 };
 
@@ -76,23 +69,18 @@ module.exports.removeCardLike = (req, res, next) => {
     { new: true },
   )
     .orFail(() => {
-      const err = new Error('Такой карточки не обнаружено');
-      err.statusCode = NOT_FOUND;
-      next(err);
+      next(new NotFoundError('Такой карточки не обнаружено'));
     })
     .then((card) => {
       if (!card) {
-        const err = new Error('Такой карточки не обнаружено');
-        err.statusCode = NOT_FOUND;
-        next(err);
+        return next(new NotFoundError('Такой карточки не обнаружено'));
       }
       return res.status(200).send({ message: 'Лайк удалён' });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        const err = new Error('Ошибка в ID карточки');
-        err.statusCode = INCORRECT_DATA;
-        next(err);
+        return next(new WrongDataError('Ошибка в ID карточки'));
       }
+      return next(error);
     });
 };
