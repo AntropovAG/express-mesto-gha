@@ -5,6 +5,7 @@ const { Joi, celebrate, errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { userLogin, createNewUser } = require('./controllers/users');
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -14,6 +15,8 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(requestLogger);
 
 app.use('/signin', celebrate({
   body: Joi.object().keys({
@@ -39,6 +42,7 @@ app.use('/', require('./routes/cards'));
 
 app.use((req, res, next) => next(new NotFoundError('Такой страницы не существует')));
 
+app.use(errorLogger);
 app.use(errors());
 app.use(errorsHandler);
 app.listen(PORT, console.log('Сервер запущен и слушает порт:', PORT));
