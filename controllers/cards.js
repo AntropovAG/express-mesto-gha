@@ -75,7 +75,7 @@ module.exports.removeCardLike = (req, res, next) => {
       if (!card) {
         return next(new NotFoundError('Такой карточки не обнаружено'));
       }
-      return res.status(200).send({ message: 'Лайк удалён' });
+      return res.status(200).send({ card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
