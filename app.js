@@ -8,7 +8,7 @@ const cors = require('cors');
 const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { userLogin, createNewUser } = require('./controllers/users');
+const { userLogin, createNewUser, userSignOut } = require('./controllers/users');
 const NotFoundError = require('./errors/NotFoundError');
 
 const corsOptions = {
@@ -58,6 +58,8 @@ app.use(auth);
 
 app.use('/', require('./routes/users'));
 app.use('/', require('./routes/cards'));
+
+app.use('/signout', userSignOut);
 
 app.use((req, res, next) => next(new NotFoundError('Такой страницы не существует')));
 
