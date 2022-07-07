@@ -8,8 +8,8 @@ const {
 } = require('../errors/errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const YOUR_JWT = ''; // вставьте сюда JWT, который вернул публичный сервер студента
-const SECRET_KEY_DEV = ''; // вставьте сюда секретный ключ для разработки из кода студента
+const YOUR_JWT = '';
+const SECRET_KEY_DEV = 'some-secret-key';
 const DuplicateEmailError = require('../errors/DuplicateEmailError');
 const NotFoundError = require('../errors/NotFoundError');
 const WrongDataError = require('../errors/WrongDataError');
