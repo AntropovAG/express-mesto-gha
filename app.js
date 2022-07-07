@@ -11,19 +11,19 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { userLogin, createNewUser } = require('./controllers/users');
 const NotFoundError = require('./errors/NotFoundError');
 
-// const corsOptions = {
-//   origin: [
-//     'http://localhost:3000',
-//     'http://localhost:3001',
-//     'https://projectmesto.antropovag.nomoredomains.sbs',
-//     'http://projectmesto.antropovag.nomoredomains.sbs',
-//     'https://antropovag.github.io',
-//   ],
-//   credentials: true,
-// };
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://projectmesto.antropovag.nomoredomains.sbs',
+    'http://projectmesto.antropovag.nomoredomains.sbs',
+    'https://antropovag.github.io',
+  ],
+  credentials: true,
+};
 const { PORT = 3001 } = process.env;
 const app = express();
-app.use(cors());
+app.use('*', cors(corsOptions));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
