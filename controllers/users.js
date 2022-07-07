@@ -116,7 +116,9 @@ module.exports.userLogin = (req, res, next) => {
         return next(new WrongEmailOrPasswordError('Неправильный e-mail или пароль'));
       }
       const token = jwt.sign({ _id: user.id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-      res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, SameSite: 'none' });
+      res.cookie('jwt', token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, SameSite: 'none', Secure: true,
+      });
       return res.send({ token });
     })
     .catch((error) => {
