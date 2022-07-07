@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (!token) {
-    return next(new WrongEmailOrPasswordError('Необходима авторизация'));
+    return next(new WrongEmailOrPasswordError('Необходима авторизация - нет токена'));
   }
 
   let payload;
@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return next(new WrongEmailOrPasswordError('Необходима авторизация'));
+    return next(new WrongEmailOrPasswordError('Необходима авторизация - токен не прошёл проверку'));
   }
 
   req.user = payload;
