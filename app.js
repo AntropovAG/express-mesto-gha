@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const { Joi, celebrate, errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -21,8 +23,16 @@ const corsOptions = {
   ],
   credentials: true,
 };
+const requestLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const { PORT = 3000 } = process.env;
 const app = express();
+app.use(helmet());
 app.use('*', cors(corsOptions));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -30,7 +40,7 @@ app.use(cookieParser());
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(requestLogger);
-
+app.use(requestLimiter);
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');

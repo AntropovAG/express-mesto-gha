@@ -150,6 +150,7 @@ module.exports.userSignOut = (req, res) => {
 };
 
 try {
+  // eslint-disable-next-line no-unused-vars
   const payload = jwt.verify(YOUR_JWT, SECRET_KEY_DEV);
   console.log('\x1b[31m%s\x1b[0m', `
   Надо исправить. В продакшне используется тот же
