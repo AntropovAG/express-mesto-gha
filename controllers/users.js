@@ -8,8 +8,6 @@ const {
 } = require('../errors/errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const YOUR_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmM2YjA3MmU0NmE3YWYzOGI0ODE3MjciLCJpYXQiOjE2NTcxODg0NzYsImV4cCI6MTY1Nzc5MzI3Nn0.pb1VbpyiKVSrrI5BIrBzr8WOXfliP_1u2FvwEW4VMEc';
-const SECRET_KEY_DEV = 'some-secret-key';
 const DuplicateEmailError = require('../errors/DuplicateEmailError');
 const NotFoundError = require('../errors/NotFoundError');
 const WrongDataError = require('../errors/WrongDataError');
@@ -148,25 +146,3 @@ module.exports.getCurrentUserInfo = (req, res, next) => {
 module.exports.userSignOut = (req, res) => {
   res.clearCookie('jwt').send({ message: 'Куки с сервера удалены' });
 };
-
-try {
-  // eslint-disable-next-line no-unused-vars
-  const payload = jwt.verify(YOUR_JWT, SECRET_KEY_DEV);
-  console.log('\x1b[31m%s\x1b[0m', `
-  Надо исправить. В продакшне используется тот же
-  секретный ключ, что и в режиме разработки.
-  `);
-} catch (err) {
-  if (err.name === 'JsonWebTokenError' && err.message === 'invalid signature') {
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      'Всё в порядке. Секретные ключи отличаются',
-    );
-  } else {
-    console.log(
-      '\x1b[33m%s\x1b[0m',
-      'Что-то не так',
-      err,
-    );
-  }
-}
